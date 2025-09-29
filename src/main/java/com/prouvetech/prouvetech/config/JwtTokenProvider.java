@@ -55,7 +55,7 @@ public class JwtTokenProvider {
 
     // Extraire les informations de la charge utile du token
     private Claims getClaimsFromToken(String token) {
-        Key key = Keys.hmacShaKeyFor(secretKey.getBytes()); // Assurez-vous d'utiliser la même clé
+        Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
 
         return Jwts.parserBuilder() // Méthode mise à jour pour parser le token
                 .setSigningKey(key)
