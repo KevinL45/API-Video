@@ -9,26 +9,23 @@ public class UserDTO {
     private String lastname;
     private String mail;
     private String password;
-    private Long statusId;
     private String telephone;
     private String title;
     private MultipartFile photo;
     private String linkPhoto;
     private String description;
-    private StatusDTO status;
 
     public UserDTO() {
 
     }
 
     public UserDTO(Long id, String firstname, String lastname, String mail, String title, String description,
-            StatusDTO status, String linkPhoto) {
+            String linkPhoto) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
         this.mail = mail;
         this.title = title;
-        this.status = status;
         this.description = description;
         this.linkPhoto = linkPhoto;
     }
@@ -87,22 +84,6 @@ public class UserDTO {
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
-    }
-
-    public Long getStatusId() {
-        return statusId;
-    }
-
-    public void setStatusId(Long statusId) {
-        this.statusId = statusId;
-    }
-
-    public StatusDTO getStatus() {
-        return status;
-    }
-
-    public void setStatus(StatusDTO status) {
-        this.status = status;
     }
 
     public String getTelephone() {

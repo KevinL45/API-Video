@@ -22,9 +22,6 @@ public class UserService implements UserDetailsService {
     private UserRepository userRepository;
 
     @Autowired
-    private RoleService roleService;
-
-    @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -66,12 +63,10 @@ public class UserService implements UserDetailsService {
 
         user.setPassword(hashPassword(user.getPassword()));
         Role roleToAssign = new Role();
-        roleToAssign = roleService.getRoleByStatus(user.getStatus()).get();
 
         user.setRoles(List.of(roleToAssign));
         userRepository.save(user);
-        return new ResponseMessage(true, "Vous êtes inscrit. Votre rôle est \"" + roleToAssign.getName() +
-                "\", et votre statut est \"" + user.getStatus().getName() + "\".");
+        return new ResponseMessage(true, "Vous êtes inscrit");
     }
 
     public ResponseMessage updateUser(User user) {
@@ -79,9 +74,7 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
 
         return new ResponseMessage(true,
-                "Votre compte a été modifié, Voici votre role de '"
-                        + roleService.getRoleByStatus(user.getStatus()).get().getName()
-                        + "'', votre statut est '" + user.getStatus().getName() + "'");
+                "Votre compte a été modifié");
 
     }
 
@@ -105,13 +98,9 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    public List<User> searchUser(String title, Long statusId) {
-        if (title != null && statusId != null) {
-            return userRepository.findByTitleContainingIgnoreCaseAndStatusId(title, statusId);
-        } else if (title != null) {
+    public List<User> searchUser(String title) {
+        if (title != null) {
             return userRepository.findByTitleContainingIgnoreCase(title);
-        } else if (statusId != null) {
-            return userRepository.findByStatusId(statusId);
         } else {
             return userRepository.findAll();
         }

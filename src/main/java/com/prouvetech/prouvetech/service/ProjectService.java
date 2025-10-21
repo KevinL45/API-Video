@@ -65,13 +65,9 @@ public class ProjectService {
                 "Le project '" + projet.getName() + "'' avec l'ID " + projet.getId() + ", a été supprimé avec succès.");
     }
 
-    public List<Project> searchProjects(String name, List<Long> toolIds) {
-        if (name != null && toolIds != null && !toolIds.isEmpty()) {
-            return projectRepository.findDistinctByNameContainingIgnoreCaseAndToolsIdIn(name, toolIds);
-        } else if (name != null) {
+    public List<Project> searchProjects(String name) {
+        if (name != null) {
             return projectRepository.findByNameContainingIgnoreCase(name);
-        } else if (toolIds != null && !toolIds.isEmpty()) {
-            return projectRepository.findDistinctByToolsIdIn(toolIds);
         } else {
             return projectRepository.findAll();
         }

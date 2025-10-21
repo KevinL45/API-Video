@@ -1,7 +1,5 @@
 package com.prouvetech.prouvetech.dto;
 
-import java.util.List;
-
 import org.springframework.web.multipart.MultipartFile;
 
 public class ProjectDTO {
@@ -14,9 +12,6 @@ public class ProjectDTO {
     private MultipartFile thumbnail;
     private String link_thumbnail;
     private UserDTO user;
-    private List<ToolDTO> tools;
-
-    private List<Long> toolsIds;
 
     public ProjectDTO() {
 
@@ -30,19 +25,6 @@ public class ProjectDTO {
         this.sourcecode = soucecode;
         this.link_video = link_video;
         this.link_thumbnail = link_thumbnail;
-        this.user = user;
-    }
-
-    public ProjectDTO(long id, String name, String description, String link_video, String link_thumbnail,
-            String soucecode,
-            UserDTO user, List<ToolDTO> tools) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.sourcecode = soucecode;
-        this.link_video = link_video;
-        this.link_thumbnail = link_thumbnail;
-        this.tools = tools;
         this.user = user;
     }
 
@@ -76,14 +58,6 @@ public class ProjectDTO {
 
     public void setSourcecode(String sourcecode) {
         this.sourcecode = sourcecode;
-    }
-
-    public List<ToolDTO> getTools() {
-        return tools;
-    }
-
-    public void setTools(List<ToolDTO> tools) {
-        this.tools = tools;
     }
 
     public MultipartFile getVideo() {
@@ -124,14 +98,6 @@ public class ProjectDTO {
 
     public void setLink_video(String link_video) {
         this.link_video = link_video;
-    }
-
-    public List<Long> getToolsIds() {
-        return toolsIds;
-    }
-
-    public void setToolsIds(List<Long> toolsIds) {
-        this.toolsIds = toolsIds;
     }
 
 }

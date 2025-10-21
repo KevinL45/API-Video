@@ -3,7 +3,6 @@ package com.prouvetech.prouvetech.controller;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +20,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prouvetech.prouvetech.dto.ProjectDTO;
-import com.prouvetech.prouvetech.dto.StatusDTO;
-import com.prouvetech.prouvetech.dto.ToolDTO;
 import com.prouvetech.prouvetech.dto.UserDTO;
 import com.prouvetech.prouvetech.model.Project;
-import com.prouvetech.prouvetech.model.Tool;
 import com.prouvetech.prouvetech.model.User;
 import com.prouvetech.prouvetech.service.ProjectService;
-import com.prouvetech.prouvetech.service.ToolService;
 import com.prouvetech.prouvetech.service.UserService;
 import com.prouvetech.prouvetech.utils.ResponseMessage;
 import com.prouvetech.prouvetech.utils.Uploads;
@@ -44,9 +39,6 @@ public class ProjectController {
 
         @Autowired
         private ProjectService projectService;
-
-        @Autowired
-        private ToolService toolService;
 
         @Autowired
         private UserService userService;
@@ -77,7 +69,6 @@ public class ProjectController {
                 }
                 String newVideo = uploads.saveFile(projectDTO.getVideo());
                 String newThumbnail = uploads.saveFile(projectDTO.getThumbnail());
-                List<Tool> selectedTools = toolService.getToolsByIds(projectDTO.getToolsIds());
 
                 Project project = new Project(
                                 projectDTO.getName(),
@@ -86,7 +77,6 @@ public class ProjectController {
                                 newThumbnail,
                                 projectDTO.getSourcecode(),
                                 user,
-                                selectedTools,
                                 LocalDateTime.now(),
                                 LocalDateTime.now());
 
@@ -126,10 +116,6 @@ public class ProjectController {
                         project.setThumbnail(newThumbnail);
                 }
 
-                if (projectDTO.getToolsIds() != null) {
-                        List<Tool> selectedTools = toolService.getToolsByIds(projectDTO.getToolsIds());
-                        project.setTools(selectedTools);
-                }
                 project.setName(projectDTO.getName());
                 project.setDescription(projectDTO.getDescription());
                 project.setSourceCode(projectDTO.getSourcecode());
@@ -163,9 +149,6 @@ public class ProjectController {
                                                                 p.getUser().getMail(),
                                                                 p.getUser().getTitle(),
                                                                 p.getUser().getDescription(),
-                                                                new StatusDTO(
-                                                                                p.getUser().getStatus().getId(),
-                                                                                p.getUser().getStatus().getName()),
                                                                 p.getUser().getPhoto())))
                                 .toList();
                 return ResponseEntity.ok(projects_dto);
@@ -175,15 +158,6 @@ public class ProjectController {
         public ResponseEntity<ProjectDTO> getProject(@PathVariable Long id) {
 
                 Project p = projectService.getProject(id);
-
-                List<Long> toolIds = p.getTools().stream()
-                                .map(Tool::getId)
-                                .collect(Collectors.toList());
-                List<Tool> tools = toolService.getToolsByIds(toolIds);
-                List<ToolDTO> toolsDto = tools.stream()
-                                .map(t -> new ToolDTO(t.getId(), t.getName(), t.getLogo()))
-                                .collect(Collectors.toList());
-
                 ProjectDTO projectDTO = new ProjectDTO(
                                 p.getId(),
                                 p.getName(),
@@ -198,11 +172,7 @@ public class ProjectController {
                                                 p.getUser().getMail(),
                                                 p.getUser().getTitle(),
                                                 p.getUser().getDescription(),
-                                                new StatusDTO(
-                                                                p.getUser().getStatus().getId(),
-                                                                p.getUser().getStatus().getName()),
-                                                p.getUser().getPhoto()),
-                                toolsDto);
+                                                p.getUser().getPhoto()));
 
                 return ResponseEntity.ok(projectDTO);
         }
@@ -214,15 +184,6 @@ public class ProjectController {
                 User user = userService.getUserByMail(authentication.getName());
 
                 Project p = projectService.getMyProject(id, user.getId());
-
-                List<Long> toolIds = p.getTools().stream()
-                                .map(Tool::getId)
-                                .collect(Collectors.toList());
-                List<Tool> tools = toolService.getToolsByIds(toolIds);
-                List<ToolDTO> toolsDto = tools.stream()
-                                .map(t -> new ToolDTO(t.getId(), t.getName(), t.getLogo()))
-                                .collect(Collectors.toList());
-
                 ProjectDTO projectDTO = new ProjectDTO(
                                 p.getId(),
                                 p.getName(),
@@ -237,11 +198,7 @@ public class ProjectController {
                                                 p.getUser().getMail(),
                                                 p.getUser().getTitle(),
                                                 p.getUser().getDescription(),
-                                                new StatusDTO(
-                                                                p.getUser().getStatus().getId(),
-                                                                p.getUser().getStatus().getName()),
-                                                p.getUser().getPhoto()),
-                                toolsDto);
+                                                p.getUser().getPhoto()));
 
                 return ResponseEntity.ok(projectDTO);
         }
@@ -251,7 +208,7 @@ public class ProjectController {
                         @RequestParam(required = false) String name,
                         @RequestParam(required = false) List<Long> toolsIds) {
 
-                List<Project> projects = projectService.searchProjects(name, toolsIds);
+                List<Project> projects = projectService.searchProjects(name);
                 List<ProjectDTO> projects_dto = projects.stream()
                                 .map(p -> new ProjectDTO(
                                                 p.getId(),
@@ -267,9 +224,6 @@ public class ProjectController {
                                                                 p.getUser().getMail(),
                                                                 p.getUser().getTitle(),
                                                                 p.getUser().getDescription(),
-                                                                new StatusDTO(
-                                                                                p.getUser().getStatus().getId(),
-                                                                                p.getUser().getStatus().getName()),
                                                                 p.getUser().getPhoto())))
                                 .toList();
                 return ResponseEntity.ok(projects_dto);

@@ -3,8 +3,6 @@ package com.prouvetech.prouvetech.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "project")
@@ -41,30 +39,14 @@ public class Project {
     @Column(nullable = true)
     private LocalDateTime deleteDate;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
-
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    // Relation Many-to-Many avec Tool
-    @ManyToMany
-    @JoinTable(name = "project_tools", // Table de jointure
-            joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "tool_id"))
-    private List<Tool> tools = new ArrayList<>();
-
-    // Relation Many-to-Many avec Document
-    @ManyToMany
-    @JoinTable(name = "project_documents", // Table de jointure
-            joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "document_id"))
-    private List<Document> documents = new ArrayList<>();
 
     public Project() {
     }
 
     public Project(String name, String description, String video, String thumbnail, String sourceCode, User user,
-            List<Document> documents, List<Tool> tools,
             LocalDateTime createDate,
             LocalDateTime updateDate) {
         this.name = name;
@@ -75,23 +57,6 @@ public class Project {
         this.user = user;
         this.createDate = createDate;
         this.updateDate = updateDate;
-        this.documents = documents;
-        this.tools = tools;
-    }
-
-    public Project(String name, String description, String video, String thumbnail, String sourceCode, User user,
-            List<Tool> tools,
-            LocalDateTime createDate,
-            LocalDateTime updateDate) {
-        this.name = name;
-        this.description = description;
-        this.video = video;
-        this.thumbnail = thumbnail;
-        this.sourceCode = sourceCode;
-        this.user = user;
-        this.createDate = createDate;
-        this.updateDate = updateDate;
-        this.tools = tools;
     }
 
     public Project(String name, String description, String video, String thumbnail, String sourceCode, User user,
@@ -185,28 +150,12 @@ public class Project {
         this.deleteDate = deleteDate;
     }
 
-    public List<Tool> getTools() {
-        return tools;
-    }
-
-    public void setTools(List<Tool> tools) {
-        this.tools = tools;
-    }
-
     public User getUser() {
         return user;
     }
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public List<Document> getDocuemnts() {
-        return this.documents;
-    }
-
-    public void setDocuments(List<Document> documents) {
-        this.documents = documents;
     }
 
     @Override
@@ -221,8 +170,6 @@ public class Project {
                 ", createDate=" + createDate +
                 ", updateDate=" + updateDate +
                 ", deleteDate=" + deleteDate +
-                ", tools=" + tools +
-                ", documents=" + documents +
                 '}';
     }
 }

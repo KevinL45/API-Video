@@ -47,19 +47,9 @@ public class User implements UserDetails {
     @Column(nullable = true)
     private String photo;
 
-    @ManyToOne
-    @JoinColumn(name = "status_id", nullable = false)
-    private Status status;
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserSocialNetworks> socialNetworks = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -72,7 +62,7 @@ public class User implements UserDetails {
     }
 
     public User(String firstname, String lastname, String mail, String password,
-            String title, String description, String telephone, String cv, String photo, Status status) {
+            String title, String description, String telephone, String cv, String photo) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.mail = mail;
@@ -82,16 +72,13 @@ public class User implements UserDetails {
         this.telephone = telephone;
         this.cv = cv;
         this.photo = photo;
-        this.status = status;
     }
 
-    public User(String firstname, String lastname, String mail, String password,
-            Status status) {
+    public User(String firstname, String lastname, String mail, String password) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.mail = mail;
         this.password = password;
-        this.status = status;
     }
 
     public User(String mail, String password) {
@@ -180,36 +167,12 @@ public class User implements UserDetails {
         this.photo = photo;
     }
 
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
     public List<Role> getRoles() {
         return roles;
     }
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
-    }
-
-    public List<UserSocialNetworks> getSocialNetworks() {
-        return socialNetworks;
-    }
-
-    public void setSocialNetwork(List<UserSocialNetworks> socialNetworks) {
-        this.socialNetworks = socialNetworks;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
     }
 
     @Override

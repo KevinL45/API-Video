@@ -1,23 +1,16 @@
 package com.prouvetech.prouvetech.controller;
 
 import com.prouvetech.prouvetech.dto.ProjectDTO;
-import com.prouvetech.prouvetech.dto.StatusDTO;
 import com.prouvetech.prouvetech.dto.UserDTO;
 import com.prouvetech.prouvetech.model.Project;
-import com.prouvetech.prouvetech.model.Role;
-import com.prouvetech.prouvetech.model.Status;
 import com.prouvetech.prouvetech.model.User;
 import com.prouvetech.prouvetech.service.ProjectService;
-import com.prouvetech.prouvetech.service.RoleService;
-import com.prouvetech.prouvetech.service.StatusService;
 import com.prouvetech.prouvetech.service.UserService;
 import com.prouvetech.prouvetech.utils.ResponseMessage;
 import com.prouvetech.prouvetech.utils.Uploads;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,21 +34,13 @@ public class UserController {
     private ProjectService projectService;
 
     @Autowired
-    private StatusService statusService;
-
-    @Autowired
     private Uploads uploads;
-
-    @Autowired
-    private RoleService roleService;
 
     @PostMapping("/register")
     public ResponseEntity<ResponseMessage> addUser(@RequestBody UserDTO userDTO) {
 
-        Status status = this.statusService.getStatus(userDTO.getStatusId());
-
-        User newUser = new User(userDTO.getFirstname(), userDTO.getLastname(), userDTO.getMail(), userDTO.getPassword(),
-                status);
+        User newUser = new User(userDTO.getFirstname(), userDTO.getLastname(),
+                userDTO.getMail(), userDTO.getPassword());
         ResponseMessage result = userService.createUser(newUser);
 
         if (!result.isSuccess()) {
@@ -72,9 +57,6 @@ public class UserController {
         String email = authentication.getName();
         User user = userService.getUserByMail(email);
 
-        Status status = statusService.getStatus(userDTO.getStatusId());
-        Optional<Role> role = roleService.getRoleByStatus(status);
-
         Tika tika = new Tika();
 
         String detectedTypePhoto = tika.detect(userDTO.getPhoto().getInputStream());
@@ -86,40 +68,11 @@ public class UserController {
 
         String newphoto = uploads.updateFile(userDTO.getPhoto(), user.getPhoto());
 
-        // List<UserSocialNetworks> newUserSocials = new ArrayList<>();
-
-        // for (String link : userDTO.getLink_social_networks()) {
-        // SocialNetworks socialNetwork =
-        // socialNetworksService.detectNetworkNameFromUrl(link);
-
-        // if (socialNetwork != null) {
-        // UserSocialNetworks usn = new UserSocialNetworks();
-
-        // UserSocialNetworksId compositeKey = new UserSocialNetworksId(user.getId(),
-        // socialNetwork.getId());
-        // usn.setUserSocialNetworksId(compositeKey);
-
-        // usn.setUser(user);
-        // usn.setSocialNetwork(socialNetwork);
-        // usn.setProfileUrl(link);
-        // newUserSocials.add(usn);
-        // } else {
-        // ResponseMessage message = new ResponseMessage(false,
-        // "Le réseau social pour le lien '" + link + "' n'est pas reconnu.");
-        // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
-
-        // }
-        // }
-
         user.setFirstname(userDTO.getFirstname());
         user.setLastname(userDTO.getLastname());
         user.setTitle(userDTO.getTitle());
         user.setDescription(userDTO.getDescription());
         user.setPhoto(newphoto);
-        user.setStatus(status);
-        user.setRoles(new ArrayList<>(List.of(role.get())));
-        // user.getSocialNetworks().clear();
-        // user.getSocialNetworks().addAll(newUserSocials);
         ResponseMessage result = userService.updateUser(user);
 
         if (!result.isSuccess()) {
@@ -134,7 +87,6 @@ public class UserController {
     public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
 
         User user = userService.getUser(id);
-        StatusDTO statusDTO = new StatusDTO(user.getStatus().getId(), user.getStatus().getName());
 
         UserDTO userDTO = new UserDTO(
                 user.getId(),
@@ -143,7 +95,6 @@ public class UserController {
                 user.getMail(),
                 user.getTitle(),
                 user.getDescription(),
-                statusDTO,
                 user.getPhoto());
 
         return ResponseEntity.ok(userDTO);
@@ -154,7 +105,6 @@ public class UserController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.getUserByMail(authentication.getName());
-        StatusDTO statusDTO = new StatusDTO(user.getStatus().getId(), user.getStatus().getName());
 
         UserDTO userDTO = new UserDTO(
                 user.getId(),
@@ -163,7 +113,6 @@ public class UserController {
                 user.getMail(),
                 user.getTitle(),
                 user.getDescription(),
-                statusDTO,
                 user.getPhoto());
 
         return ResponseEntity.ok(userDTO);
@@ -175,14 +124,12 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.getUserByMail(authentication.getName());
 
-        StatusDTO statusDTO = new StatusDTO(user.getStatus().getId(), user.getStatus().getName());
         UserDTO userDTO = new UserDTO(user.getId(),
                 user.getFirstname(),
                 user.getLastname(),
                 user.getMail(),
                 user.getTitle(),
                 user.getDescription(),
-                statusDTO,
                 user.getPhoto());
 
         List<Project> projects = projectService.getMyProjects(user);
@@ -208,14 +155,12 @@ public class UserController {
 
         List<Project> projects = projectService.getMyProjects(user);
 
-        StatusDTO statusDTO = new StatusDTO(user.getStatus().getId(), user.getStatus().getName());
         UserDTO userDTO = new UserDTO(user.getId(),
                 user.getFirstname(),
                 user.getLastname(),
                 user.getMail(),
                 user.getTitle(),
                 user.getDescription(),
-                statusDTO,
                 user.getPhoto());
         List<ProjectDTO> projects_dto = projects.stream()
                 .map(p -> new ProjectDTO(
@@ -243,7 +188,6 @@ public class UserController {
                         u.getMail(),
                         u.getTitle(),
                         u.getDescription(),
-                        new StatusDTO(u.getStatus().getId(), u.getStatus().getName()),
                         u.getPhoto()))
                 .toList();
         return ResponseEntity.ok(dtos);
@@ -267,7 +211,7 @@ public class UserController {
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Long statusId) {
 
-        List<User> users = userService.searchUser(title, statusId);
+        List<User> users = userService.searchUser(title);
         List<UserDTO> userDTOs = users.stream()
                 .map(u -> new UserDTO(
                         u.getId(),
@@ -276,7 +220,6 @@ public class UserController {
                         u.getMail(),
                         u.getTitle(),
                         u.getDescription(),
-                        new StatusDTO(u.getStatus().getId(), u.getStatus().getName()),
                         u.getPhoto()))
                 .toList();
 

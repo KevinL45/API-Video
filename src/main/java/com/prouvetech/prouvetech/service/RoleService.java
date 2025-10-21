@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.prouvetech.prouvetech.model.Role;
-import com.prouvetech.prouvetech.model.Status;
 import com.prouvetech.prouvetech.repository.RoleRepository;
 
 @Service
@@ -51,17 +50,5 @@ public class RoleService {
             throw new RuntimeException("Rôle non trouvé avec l'ID : " + id);
         }
         roleRepository.deleteById(id);
-    }
-
-    public Optional<Role> getRoleByStatus(Status status) {
-        String statusName = status.getName().toLowerCase();
-
-        if (statusName.equalsIgnoreCase("developer")) {
-            return roleRepository.findByName("ROLE_DEVELOPER");
-        } else if (statusName.equalsIgnoreCase("recruit")) {
-            return roleRepository.findByName("ROLE_RECRUIT");
-        }
-
-        throw new IllegalArgumentException("Statut non reconnu : " + statusName);
     }
 }
